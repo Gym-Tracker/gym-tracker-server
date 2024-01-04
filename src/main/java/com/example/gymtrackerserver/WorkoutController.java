@@ -1,11 +1,14 @@
 package com.example.gymtrackerserver;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.*;
 
+// TODO: remove cross origin annotation
+@CrossOrigin(origins = "http://127.0.0.1:5173")
 @RestController
 public class WorkoutController {
 
