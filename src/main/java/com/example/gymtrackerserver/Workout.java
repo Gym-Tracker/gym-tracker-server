@@ -1,6 +1,6 @@
 package com.example.gymtrackerserver;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
-public record Workout(Date date, int duration, Exercise[] exercises) {
+public record Workout(Timestamp date, int duration, Exercise[] exercises) {
 }
