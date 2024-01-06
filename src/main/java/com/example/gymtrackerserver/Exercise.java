@@ -1,4 +1,4 @@
 package com.example.gymtrackerserver;
 
-public record Exercise(String name, Set[] sets) {
+public record Exercise(int id, Set[] sets) {
 }
