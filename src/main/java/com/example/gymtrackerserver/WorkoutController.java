@@ -3,8 +3,7 @@ package com.example.gymtrackerserver;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 // TODO: remove cross origin annotation
 @CrossOrigin(origins = "http://127.0.0.1:5173")
@@ -61,23 +60,63 @@ public class WorkoutController {
     @GetMapping("/workout")
     Workout[] workouts() {
         List<Workout> workouts = new ArrayList<>();
-        String SQL = "SELECT * FROM workout WHERE user_id = ?";
+
+        String workoutSQL = "SELECT * FROM workout WHERE user_id = ?";
+        String setSQL = "SELECT workout_id, exercise_id, type, weight, reps"
+                + " FROM set INNER JOIN workout ON workout.id = set.workout_id"
+                + " WHERE user_id = ?";
 
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
 
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
-            pstmt.setInt(1, userID);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                System.out.println(rs.getInt("duration"));
-                System.out.println(rs.getTimestamp("timestamp"));
+            PreparedStatement workoutPstmt = conn.prepareStatement(workoutSQL);
+            workoutPstmt.setInt(1, userID);
+            ResultSet workoutRS = workoutPstmt.executeQuery();
+
+            PreparedStatement setPstmt = conn.prepareStatement(setSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            setPstmt.setInt(1, userID);
+            ResultSet setRS = setPstmt.executeQuery();
+
+            while (workoutRS.next()) {
+                int workoutID = workoutRS.getInt("id");
+
+                // Linked hash map used as it keeps the elements in the order they were inserted
+                Map<Integer, List<Set>> exercisesAndSets = new LinkedHashMap<>();
+                while (setRS.next()) {
+                    if (setRS.getInt("workout_id") == workoutID) {
+
+                        int exerciseID = setRS.getInt("exercise_id");
+
+                        int type = setRS.getInt("type");
+                        float weight = setRS.getFloat("weight");
+                        int reps = setRS.getInt("reps");
+
+                        if (!exercisesAndSets.containsKey(exerciseID)) {
+                            exercisesAndSets.put(exerciseID, new ArrayList<>());
+                        }
+                        exercisesAndSets.get(exerciseID).add(new Set(type, weight, reps));
+                    }
+                }
+
+                // Reset result set of exercise sets back to beginning for next loop
+                setRS.beforeFirst();
+
+                List<Exercise> exercisesList = new ArrayList<>();
+                for (Integer exerciseID : exercisesAndSets.keySet()) {
+
+                    List<Set> setsList = exercisesAndSets.get(exerciseID);
+                    Set[] sets = setsList.toArray(new Set[0]);
+
+                    exercisesList.add(new Exercise(exerciseID, sets));
+                }
+                Exercise[] exercises = exercisesList.toArray(new Exercise[0]);
+
                 workouts.add(
                         new Workout(
-                                rs.getTimestamp("timestamp"),
-                                rs.getInt("duration"),
-                                new Exercise[] {}
+                                workoutRS.getTimestamp("timestamp"),
+                                workoutRS.getInt("duration"),
+                                exercises
                         )
                 );
             }
