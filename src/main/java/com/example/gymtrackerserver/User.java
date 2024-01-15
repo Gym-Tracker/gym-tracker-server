@@ -1,4 +1,4 @@
 package com.example.gymtrackerserver;
 
-public record User(String name, String email, String password, int age) {
+public record User(String email, String password) {
 }

@@ -129,7 +129,7 @@ public class WorkoutController {
 
     @PostMapping("user")
     Connection newUser(@RequestBody User newUser) {
-        String SQL = "INSERT INTO \"user\" (email, name, age, password) VALUES (?, ?, ?, ?)";
+        String SQL = "INSERT INTO \"user\" (email, password) VALUES (?, ?)";
 
         Connection conn = null;
         try {
@@ -138,9 +138,7 @@ public class WorkoutController {
             PreparedStatement pstmt = conn.prepareStatement(SQL);
 
             pstmt.setString(1, newUser.email());
-            pstmt.setString(2, newUser.name());
-            pstmt.setInt(3, newUser.age());
-            pstmt.setString(4, newUser.password());
+            pstmt.setString(2, newUser.password());
 
             pstmt.execute();
         } catch (SQLException e) {
