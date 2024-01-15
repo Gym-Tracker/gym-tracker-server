@@ -146,4 +146,29 @@ public class WorkoutController {
         }
         return conn;
     }
+
+    @PostMapping("/login")
+    boolean login(@RequestBody User potentialUser) {
+        String SQL = "SELECT * FROM \"user\" WHERE email = ?";
+
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            pstmt.setString(1, potentialUser.email());
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return Objects.equals(potentialUser.password(), rs.getString("password"));
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return false;
+    }
 }
