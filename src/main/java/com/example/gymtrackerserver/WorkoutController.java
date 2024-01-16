@@ -129,8 +129,8 @@ public class WorkoutController {
         return workouts.toArray(new Workout[0]);
     }
 
-    @PostMapping("user")
-    Connection newUser(@RequestBody User newUser) {
+    @PostMapping("/register")
+    Connection register(@RequestBody User newUser) {
         String SQL = "INSERT INTO \"user\" (email, password) VALUES (?, ?)";
 
         Connection conn = null;
