@@ -197,9 +197,4 @@ public class WorkoutController {
 
         return false;
     }
-
-    @GetMapping("/cookietest")
-    void cookieTest(@CookieValue("session-id") String session_id) {
-        System.out.println(session_id);
-    }
 }
