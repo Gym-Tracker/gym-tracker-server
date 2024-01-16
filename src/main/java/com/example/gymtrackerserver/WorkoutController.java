@@ -130,7 +130,7 @@ public class WorkoutController {
     }
 
     @PostMapping("/register")
-    Connection register(@RequestBody User newUser) {
+    void register(@RequestBody User newUser) {
         String SQL = "INSERT INTO \"user\" (email, password) VALUES (?, ?)";
 
         Connection conn = null;
@@ -146,7 +146,6 @@ public class WorkoutController {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return conn;
     }
 
     @PostMapping("/login")
