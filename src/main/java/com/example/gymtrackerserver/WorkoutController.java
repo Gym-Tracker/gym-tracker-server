@@ -1,10 +1,11 @@
 package com.example.gymtrackerserver;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 // TODO: remove cross origin annotation
 @CrossOrigin(origins = "http://127.0.0.1:5173")
@@ -149,7 +150,8 @@ public class WorkoutController {
     }
 
     @PostMapping("/login")
-    boolean login(@RequestBody User potentialUser) {
+    boolean login(@RequestBody User potentialUser, HttpServletResponse response) {
+
         String userSQL = "SELECT * FROM \"user\" WHERE email = ?";
         String sessionSQL = "INSERT INTO session (id, user_id, last_used) VALUES (?, ?, ?)";
 
@@ -175,6 +177,9 @@ public class WorkoutController {
                     sessionPstmt.setDate(3, sqlDate);
 
                     sessionPstmt.execute();
+
+                    Cookie cookie = new Cookie("session-id", sessionID);
+                    response.addCookie(cookie);
 
                     return true;
 
