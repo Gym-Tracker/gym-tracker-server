@@ -24,3 +24,9 @@ CREATE TABLE set(
     weight NUMERIC(5, 2),
     reps INT
 );
+
+CREATE TABLE session(
+    id VARCHAR(255) PRIMARY KEY,
+    user_id INT REFERENCES "user"(id),
+    last_used DATE,
+);
