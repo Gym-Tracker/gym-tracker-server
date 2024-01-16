@@ -1,6 +1,7 @@
 package com.example.gymtrackerserver;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +18,8 @@ public class WorkoutController {
     private final String user = "postgres";
     private final String password = "#V%C9Cc&P7jh59zB";
 
-    final int userID = 15;
-
     @PostMapping("/workout")
-    Workout newWorkout(@RequestBody Workout newWorkout) {
+    Workout newWorkout(@RequestBody Workout newWorkout, @CookieValue("session-id") String session_id) {
         String workoutSQL = "INSERT INTO workout(user_id, duration, timestamp) VALUES(?, ?, ?)";
         String setSQL = "INSERT INTO set(workout_id, exercise_id, type, weight, reps) VALUES(?, ?, ?, ?, ?)";
         int workoutID;
@@ -28,6 +27,8 @@ public class WorkoutController {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
+
+            int userID = new UserIdFetcher().fetchUserId(conn, session_id);
 
             PreparedStatement pstmt = conn.prepareStatement(workoutSQL, Statement.RETURN_GENERATED_KEYS);
             pstmt.setInt(1, userID);
@@ -60,7 +61,7 @@ public class WorkoutController {
     }
 
     @GetMapping("/workout")
-    Workout[] workouts() {
+    Workout[] workouts(@CookieValue("session-id") String session_id) {
         List<Workout> workouts = new ArrayList<>();
 
         String workoutSQL = "SELECT * FROM workout WHERE user_id = ?";
@@ -71,6 +72,8 @@ public class WorkoutController {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
+
+            int userID = new UserIdFetcher().fetchUserId(conn, session_id);
 
             PreparedStatement workoutPstmt = conn.prepareStatement(workoutSQL);
             workoutPstmt.setInt(1, userID);
@@ -193,5 +196,10 @@ public class WorkoutController {
         }
 
         return false;
+    }
+
+    @GetMapping("/cookietest")
+    void cookieTest(@CookieValue("session-id") String session_id) {
+        System.out.println(session_id);
     }
 }
