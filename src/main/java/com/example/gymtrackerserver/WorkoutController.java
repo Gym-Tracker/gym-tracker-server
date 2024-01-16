@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 // TODO: remove cross origin annotation
 @CrossOrigin(origins = "http://127.0.0.1:5173")
@@ -149,19 +150,37 @@ public class WorkoutController {
 
     @PostMapping("/login")
     boolean login(@RequestBody User potentialUser) {
-        String SQL = "SELECT * FROM \"user\" WHERE email = ?";
+        String userSQL = "SELECT * FROM \"user\" WHERE email = ?";
+        String sessionSQL = "INSERT INTO session (id, user_id, last_used) VALUES (?, ?, ?)";
 
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
 
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
-            pstmt.setString(1, potentialUser.email());
+            PreparedStatement userPstmt = conn.prepareStatement(userSQL);
+            userPstmt.setString(1, potentialUser.email());
 
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = userPstmt.executeQuery();
 
             if (rs.next()) {
-                return Objects.equals(potentialUser.password(), rs.getString("password"));
+                if (Objects.equals(potentialUser.password(), rs.getString("password"))) {
+                    int userID = rs.getInt("id");
+                    String sessionID = new SessionIdGenerator().generateId();
+                    java.util.Date utilDate = new java.util.Date();
+                    java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+                    PreparedStatement sessionPstmt = conn.prepareStatement(sessionSQL);
+                    sessionPstmt.setString(1, sessionID);
+                    sessionPstmt.setInt(2, userID);
+                    sessionPstmt.setDate(3, sqlDate);
+
+                    sessionPstmt.execute();
+
+                    return true;
+
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
