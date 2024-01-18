@@ -12,7 +12,10 @@ public class UserIdFetcher {
         PreparedStatement userIdPstmt = conn.prepareStatement(userIdSQL);
         userIdPstmt.setString(1, session_id);
         ResultSet userIdRS = userIdPstmt.executeQuery();
-        userIdRS.next();
-        return userIdRS.getInt("user_id");
+        if (userIdRS.next()) {
+            return userIdRS.getInt("user_id");
+        } else {
+            return -1;
+        }
     }
 }
