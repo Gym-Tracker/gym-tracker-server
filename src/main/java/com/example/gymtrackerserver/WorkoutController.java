@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.*;
 
 // TODO: remove cross origin annotation
-@CrossOrigin(origins = "http://127.0.0.1:5173")
+@CrossOrigin(origins = "http://127.0.0.1:5173", allowCredentials = "true")
 @RestController
 public class WorkoutController {
 
