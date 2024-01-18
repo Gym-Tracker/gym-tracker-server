@@ -197,4 +197,23 @@ public class WorkoutController {
 
         return false;
     }
+
+    @PostMapping("/session")
+    boolean session(@CookieValue("session-id") String session_id) {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            int user_id = new UserIdFetcher().fetchUserId(conn, session_id);
+
+            // if no user_id was found for this session ID then -1 is returned
+            if (user_id == -1) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
 }
