@@ -133,7 +133,7 @@ public class WorkoutController {
     }
 
     @PostMapping("/register")
-    void register(@RequestBody User newUser) {
+    boolean register(@RequestBody User newUser) {
         String SQL = "INSERT INTO \"user\" (email, password) VALUES (?, ?)";
 
         Connection conn = null;
@@ -146,8 +146,10 @@ public class WorkoutController {
             pstmt.setString(2, newUser.password());
 
             pstmt.execute();
+            return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
