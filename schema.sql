@@ -25,5 +25,5 @@ CREATE TABLE set(
 CREATE TABLE session(
     id VARCHAR(255) PRIMARY KEY,
     user_id INT REFERENCES "user"(id),
-    last_used DATE,
+    last_used DATE
 );
