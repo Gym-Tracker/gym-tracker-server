@@ -13,11 +13,6 @@ CREATE TABLE workout(
     timestamp TIMESTAMP
 );
 
-CREATE TABLE exercise(
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255)
-);
-
 CREATE TABLE set(
     id SERIAL PRIMARY KEY,
     workout_id INT REFERENCES workout(id),
