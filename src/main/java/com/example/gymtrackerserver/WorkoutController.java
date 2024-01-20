@@ -4,6 +4,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.*;
 
@@ -133,22 +135,30 @@ public class WorkoutController {
 
     @PostMapping("/register")
     boolean register(@RequestBody User newUser) {
-        String SQL = "INSERT INTO \"user\" (email, password) VALUES (?, ?)";
+        String SQL = "INSERT INTO \"user\" (email, password, salt) VALUES (?, ?, ?)";
 
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url, user, password);
 
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
+            PasswordHasher passwordHasher = new PasswordHasher();
+            byte[] salt = passwordHasher.getSalt();
+            byte[] hashedPassword = passwordHasher.hashPassword(newUser.password(), salt);
 
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
             pstmt.setString(1, newUser.email());
-            pstmt.setString(2, newUser.password());
+            pstmt.setBytes(2, hashedPassword);
+            pstmt.setBytes(3, salt);
 
             pstmt.execute();
             return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -168,7 +178,8 @@ public class WorkoutController {
             ResultSet rs = userPstmt.executeQuery();
 
             if (rs.next()) {
-                if (Objects.equals(potentialUser.password(), rs.getString("password"))) {
+                byte[] hashedPassword = new PasswordHasher().hashPassword(potentialUser.password(), rs.getBytes("salt"));
+                if (Arrays.equals(hashedPassword, rs.getBytes("password"))) {
                     int userID = rs.getInt("id");
                     String sessionID = new RandomStringGenerator().generateString(128);
                     java.util.Date utilDate = new java.util.Date();
@@ -194,6 +205,10 @@ public class WorkoutController {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException(e);
         }
 
         return false;
