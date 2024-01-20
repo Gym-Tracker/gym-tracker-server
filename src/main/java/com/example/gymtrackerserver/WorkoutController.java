@@ -2,6 +2,7 @@ package com.example.gymtrackerserver;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -14,10 +15,14 @@ import java.util.*;
 @RestController
 public class WorkoutController {
 
-    // jdbc:postgresql://<database_host>:<port>/<database_name>
-    private final String url = "jdbc:postgresql://gym-tracker.ctvjp0tbn6qi.eu-west-2.rds.amazonaws.com:4323/";
-    private final String user = "postgres";
-    private final String password = "#V%C9Cc&P7jh59zB";
+    @Value("${db_url}")
+    private String url;
+
+    @Value("${db_username}")
+    private String user;
+
+    @Value("${db_password}")
+    private String password;
 
     @PostMapping("/workout")
     Workout newWorkout(@RequestBody Workout newWorkout, @CookieValue("session-id") String session_id) {
