@@ -1,7 +1,8 @@
 CREATE TABLE "user"(
     id SERIAL PRIMARY KEY,
     email VARCHAR(255),
-    password TEXT,
+    password BYTEA,
+    salt BYTEA,
     UNIQUE (email)
 );
 
