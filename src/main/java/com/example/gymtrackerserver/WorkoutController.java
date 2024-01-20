@@ -1,7 +1,6 @@
 package com.example.gymtrackerserver;
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -171,7 +170,7 @@ public class WorkoutController {
             if (rs.next()) {
                 if (Objects.equals(potentialUser.password(), rs.getString("password"))) {
                     int userID = rs.getInt("id");
-                    String sessionID = new SessionIdGenerator().generateId();
+                    String sessionID = new RandomStringGenerator().generateString(128);
                     java.util.Date utilDate = new java.util.Date();
                     java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
 
