@@ -51,7 +51,7 @@ public class WorkoutController {
                     System.out.println(set);
                     pstmt = conn.prepareStatement(setSQL);
                     pstmt.setInt(1, workoutID);
-                    pstmt.setString(2, exercise.id());
+                    pstmt.setInt(2, exercise.id());
                     pstmt.setInt(3, set.type());
                     pstmt.setFloat(4, set.weight());
                     pstmt.setInt(5, set.reps());
@@ -93,11 +93,11 @@ public class WorkoutController {
                 int workoutID = workoutRS.getInt("id");
 
                 // Linked hash map used as it keeps the elements in the order they were inserted
-                Map<String, List<Set>> exercisesAndSets = new LinkedHashMap<>();
+                Map<Integer, List<Set>> exercisesAndSets = new LinkedHashMap<>();
                 while (setRS.next()) {
                     if (setRS.getInt("workout_id") == workoutID) {
 
-                        String exerciseID = setRS.getString("exercise_id");
+                        int exerciseID = setRS.getInt("exercise_id");
 
                         int type = setRS.getInt("type");
                         float weight = setRS.getFloat("weight");
@@ -114,7 +114,7 @@ public class WorkoutController {
                 setRS.beforeFirst();
 
                 List<Exercise> exercisesList = new ArrayList<>();
-                for (String exerciseID : exercisesAndSets.keySet()) {
+                for (Integer exerciseID : exercisesAndSets.keySet()) {
 
                     List<Set> setsList = exercisesAndSets.get(exerciseID);
                     Set[] sets = setsList.toArray(new Set[0]);
