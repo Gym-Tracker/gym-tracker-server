@@ -16,7 +16,7 @@ CREATE TABLE workout(
 CREATE TABLE set(
     id SERIAL PRIMARY KEY,
     workout_id INT REFERENCES workout(id),
-    exercise_id VARCHAR(255),
+    exercise_id INT,
     type INT,
     weight NUMERIC(5, 2),
     reps INT
