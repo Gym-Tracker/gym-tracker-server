@@ -4,6 +4,10 @@ A back-end web service for saving gym workouts to a PostgreSQL database.
 
 ## How to run
 
+Configure `application.properties` file in `resources` folder
+
+Run the server:
+
 ```
 mvn spring-boot:run
 ```
